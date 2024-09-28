@@ -7,7 +7,7 @@ DirHunter is an open-source directory brute force tool for web servers written i
 - **Multi-threading:** Perform directory searches using multiple threads for improved performance.
 - **Command-line parameters:** Simple and easy to use, allowing you to specify the target URL and wordlist directly in the terminal.
 - **Supports different HTTP status codes:** Displays HTTP 200 (OK) and 403 (Forbidden) responses, making it easy to identify found and forbidden directories.
-- **ASCII Art:** A cool skull ASCII art is displayed when the tool starts!
+
 
 ## Installation
 
@@ -16,20 +16,22 @@ DirHunter is an open-source directory brute force tool for web servers written i
    ```bash
    git clone https://github.com/your-username/dirhunter.git
    cd dirhunter
+   ```
 
 2. **Build the project:**
 
     ```bash
    go build -o dirhunter
+   ```
 
 ## Usage
 
-```bash
-./dirhunter -url <target URL> -wordlist <wordlist file> [-threads <number of threads>]
-
+    ```bash
+    ./dirhunter -url <target URL> -wordlist <wordlist file> [-threads <number of threads>]
+    ```
 
 ## Contact
 
-- **Author:** Igor Batista
-- **Email:** [fel.hacking@gmail.com](mailto:fel.hacking@gmail.com)
-- **GitHub:** [github.com/igorbf495](https://github.com/igorbf495)
+    - **Author:** Igor Batista
+    - **Email:** [fel.hacking@gmail.com](mailto:fel.hacking@gmail.com)
+    - **GitHub:** [github.com/igorbf495](https://github.com/igorbf495)
