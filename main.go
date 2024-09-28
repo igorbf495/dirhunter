@@ -12,6 +12,9 @@ import (
 )
 
 func main() {
+	// Exibir a caveira ASCII
+	printSkull()
+
 	// Definir flags para URL, wordlist e número de threads
 	baseURL := flag.String("url", "", "URL alvo para força bruta (ex: http://example.com)")
 	wordlistFile := flag.String("wordlist", "", "Caminho para o arquivo de wordlist (ex: wordlist.txt)")
@@ -53,6 +56,20 @@ Exemplo:
 
 	// Iniciar força bruta
 	startBruteForce(*baseURL, words, *threads)
+}
+
+// Função para exibir a caveira em ASCII
+func printSkull() {
+	skull := `
+    .--.
+   |o_o |
+   |:_/ |
+  //   \ \
+ (|     | )
+/'\_   _/` + "`" + `\
+\___)=(___/
+`
+	fmt.Println(skull)
 }
 
 // Função para ler a wordlist do arquivo
