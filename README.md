@@ -30,6 +30,35 @@ DirHunter is an open-source directory brute force tool for web servers written i
     ./dirhunter -url <target URL> -wordlist <wordlist file> [-threads <number of threads>]
     ```
 
+## Parameters
+
+- **url:** Target URL for brute-forcing (e.g., http://example.com).
+- **wordlist:** Path to the wordlist file (e.g., wordlist.txt).
+- **threads:** Number of threads (optional, default is 10).
+
+## Example
+
+    ```bash
+    ./dirhunter -url http://arrozdoce.com -wordlist wordlist.txt -threads 20
+    ```
+
+## Output Example
+
+    ```plaintext
+        .--.
+   |o_o |
+   |:_/ |
+  //   \ \
+ (|     | )
+/'\_   _/`\
+\___)=(___/
+
+Starting DirHunter...
+[+] Found: http://example.com/admin (Status: 200 OK)
+[+] Found: http://example.com/secret (Status: 200 OK)
+[!] Forbidden: http://example.com/private (Status: 403 Forbidden)
+    ```
+
 ## Contact
 
 - **Author:** Igor Batista
