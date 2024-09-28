@@ -22,18 +22,14 @@ DirHunter is an open-source directory brute force tool for web servers written i
     ```bash
    go build -o dirhunter
 
+## Usage
+
+```bash
+./dirhunter -url <target URL> -wordlist <wordlist file> [-threads <number of threads>]
 
 
-**Usage:**
+## Contact
 
-    ```bash
-   ./dirhunter -url <target URL> -wordlist <wordlist file> [-threads <number of threads>]
-
-
-
-
-Contact
-
-Author: Igor Batista
-Email: fel.hacking@gmail.com
-GitHub: github.com/igorbf495
+- **Author:** Igor Batista
+- **Email:** [fel.hacking@gmail.com](mailto:fel.hacking@gmail.com)
+- **GitHub:** [github.com/igorbf495](https://github.com/igorbf495)
