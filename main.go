@@ -9,18 +9,17 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/fatih/color"
 )
 
 func main() {
-
 	printSkull()
-
 
 	baseURL := flag.String("url", "", "URL alvo para força bruta (ex: http://example.com)")
 	wordlistFile := flag.String("wordlist", "", "Caminho para o arquivo de wordlist (ex: wordlist.txt)")
 	threads := flag.Int("threads", 10, "Número de threads (padrão: 10)")
 
-	
 	flag.Usage = func() {
 		fmt.Println(`DirHunter - Força bruta de diretórios em servidores web
 Uso:
@@ -38,25 +37,23 @@ Exemplo:
 
 	flag.Parse()
 
-	
 	if *baseURL == "" || *wordlistFile == "" {
 		flag.Usage()
 		return
 	}
 
-	fmt.Println("Iniciando DirHunter...")
+	color.Green("Iniciando DirHunter...")
+	time.Sleep(2 * time.Second)
 
-	
 	words, err := readWordlist(*wordlistFile)
 	if err != nil {
-		fmt.Println("Erro ao ler a wordlist:", err)
+		color.Red("Erro ao ler a wordlist: %v", err)
 		return
 	}
 
-
 	startBruteForce(*baseURL, words, *threads)
+	
 }
-
 
 func printSkull() {
 	skull := `
@@ -70,7 +67,6 @@ func printSkull() {
 `
 	fmt.Println(skull)
 }
-
 
 func readWordlist(filename string) ([]string, error) {
 	file, err := os.Open(filename)
@@ -87,54 +83,51 @@ func readWordlist(filename string) ([]string, error) {
 	return words, scanner.Err()
 }
 
-
 func startBruteForce(baseURL string, wordlist []string, threads int) {
 	var wg sync.WaitGroup
 	wordChan := make(chan string)
-
+	foundCount := 0
 
 	for i := 0; i < threads; i++ {
 		wg.Add(1)
-		go worker(baseURL, wordChan, &wg)
+		go worker(baseURL, wordChan, &wg, &foundCount)
 	}
-
 
 	for _, word := range wordlist {
 		wordChan <- word
 	}
 
-
 	close(wordChan)
-
 
 	wg.Wait()
 }
 
-func worker(baseURL string, wordChan <-chan string, wg *sync.WaitGroup) {
+func worker(baseURL string, wordChan <-chan string, wg *sync.WaitGroup, foundCount *int) {
 	defer wg.Done()
 
 	for word := range wordChan {
 		url := fmt.Sprintf("%s/%s", strings.TrimRight(baseURL, "/"), word)
-		makeRequest(url)
+		makeRequest(url, foundCount)
 	}
 }
 
-
-func makeRequest(url string) {
+func makeRequest(url string, foundCount *int) {
 	client := &http.Client{
 		Timeout: 10 * time.Second,
 	}
 	resp, err := client.Get(url)
 	if err != nil {
-		fmt.Println("Erro ao fazer requisição:", err)
+		color.Yellow("Erro ao fazer requisição: %v", err)
 		return
 	}
 	defer resp.Body.Close()
 
-	
 	if resp.StatusCode == http.StatusOK {
-		fmt.Println("[+] Encontrado:", url, "(Status: 200 OK)")
+		color.Green("[+] Encontrado: %s (Status: 200 OK)", url)
+		*foundCount++
 	} else if resp.StatusCode == http.StatusForbidden {
-		fmt.Println("[!] Acesso proibido:", url, "(Status: 403 Forbidden)")
+		color.Red("[!] Acesso proibido: %s (Status: 403 Forbidden)", url)
+	} else {
+		color.Blue("[-] Status %d: %s", resp.StatusCode, url)
 	}
 }
