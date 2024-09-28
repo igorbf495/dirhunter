@@ -21,11 +21,12 @@ func main() {
 	threads := flag.Int("threads", 10, "Número de threads (padrão: 10)")
 	delay := flag.Int("delay", 0, "Atraso em milissegundos entre requisições (padrão: 0)")
 	method := flag.String("method", "GET", "Método HTTP a ser utilizado (padrão: GET)")
+	cookies := flag.String("cookies", "", "Cookies a serem enviados nas requisições (ex: cookie1=value1; cookie2=value2)")
 
 	flag.Usage = func() {
 		fmt.Println(`DirHunter - Força bruta de diretórios em servidores web
 Uso:
-  dirhunter -url <URL alvo> -wordlist <arquivo de wordlist> [-threads <número de threads>] [-delay <milissegundos>] [-method <GET|POST>]
+  dirhunter -url <URL alvo> -wordlist <arquivo de wordlist> [-threads <número de threads>] [-delay <milissegundos>] [-method <GET|POST>] [-cookies <cookies>]
 
 Parâmetros:
   -url         URL alvo para força bruta (ex: http://example.com)
@@ -33,9 +34,10 @@ Parâmetros:
   -threads     Número de threads (opcional, padrão: 10)
   -delay       Atraso em milissegundos entre requisições (opcional, padrão: 0)
   -method      Método HTTP a ser utilizado (opcional, padrão: GET)
+  -cookies     Cookies a serem enviados nas requisições (opcional)
 
 Exemplo:
-  dirhunter -url http://example.com -wordlist wordlist.txt -threads 20 -delay 100 -method POST
+  dirhunter -url http://example.com -wordlist wordlist.txt -threads 20 -delay 100 -method POST -cookies "cookie1=value1; cookie2=value2"
 `)
 	}
 
@@ -55,7 +57,7 @@ Exemplo:
 		return
 	}
 
-	startBruteForce(*baseURL, words, *threads, *delay, *method)
+	startBruteForce(*baseURL, words, *threads, *delay, *method, *cookies)
 }
 
 func printSkull() {
@@ -86,14 +88,14 @@ func readWordlist(filename string) ([]string, error) {
 	return words, scanner.Err()
 }
 
-func startBruteForce(baseURL string, wordlist []string, threads int, delay int, method string) {
+func startBruteForce(baseURL string, wordlist []string, threads int, delay int, method string, cookies string) {
 	var wg sync.WaitGroup
 	wordChan := make(chan string)
 	foundCount := 0
 
 	for i := 0; i < threads; i++ {
 		wg.Add(1)
-		go worker(baseURL, wordChan, &wg, &foundCount, delay, method)
+		go worker(baseURL, wordChan, &wg, &foundCount, delay, method, cookies)
 	}
 
 	for _, word := range wordlist {
@@ -105,12 +107,12 @@ func startBruteForce(baseURL string, wordlist []string, threads int, delay int, 
 	wg.Wait()
 }
 
-func worker(baseURL string, wordChan <-chan string, wg *sync.WaitGroup, foundCount *int, delay int, method string) {
+func worker(baseURL string, wordChan <-chan string, wg *sync.WaitGroup, foundCount *int, delay int, method string, cookies string) {
 	defer wg.Done()
 
 	for word := range wordChan {
 		url := fmt.Sprintf("%s/%s", strings.TrimRight(baseURL, "/"), word)
-		makeRequest(url, foundCount, method)
+		makeRequest(url, foundCount, method, cookies)
 
 		// Atraso entre requisições
 		if delay > 0 {
@@ -119,7 +121,7 @@ func worker(baseURL string, wordChan <-chan string, wg *sync.WaitGroup, foundCou
 	}
 }
 
-func makeRequest(url string, foundCount *int, method string) {
+func makeRequest(url string, foundCount *int, method string, cookies string) {
 	client := &http.Client{
 		Timeout: 10 * time.Second,
 	}
@@ -136,6 +138,11 @@ func makeRequest(url string, foundCount *int, method string) {
 	if err != nil {
 		color.Yellow("Erro ao criar requisição: %v", err)
 		return
+	}
+
+	// Adicionando cookies
+	if cookies != "" {
+		req.Header.Add("Cookie", cookies)
 	}
 
 	resp, err := client.Do(req)
