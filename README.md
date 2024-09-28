@@ -44,8 +44,9 @@ DirHunter is an open-source directory brute force tool for web servers written i
 
 ## Output Example
 
-    ```plaintext
-        .--.
+    ```bash
+
+    .--.
    |o_o |
    |:_/ |
   //   \ \
@@ -57,6 +58,7 @@ Starting DirHunter...
 [+] Found: http://example.com/admin (Status: 200 OK)
 [+] Found: http://example.com/secret (Status: 200 OK)
 [!] Forbidden: http://example.com/private (Status: 403 Forbidden)
+
     ```
 
 ## Contact
