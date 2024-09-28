@@ -32,6 +32,6 @@ DirHunter is an open-source directory brute force tool for web servers written i
 
 ## Contact
 
-    - **Author:** Igor Batista
-    - **Email:** [fel.hacking@gmail.com](mailto:fel.hacking@gmail.com)
-    - **GitHub:** [github.com/igorbf495](https://github.com/igorbf495)
+- **Author:** Igor Batista
+- **Email:** [fel.hacking@gmail.com](mailto:fel.hacking@gmail.com)
+- **GitHub:** [github.com/igorbf495](https://github.com/igorbf495)
