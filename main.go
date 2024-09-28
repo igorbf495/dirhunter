@@ -20,20 +20,22 @@ func main() {
 	wordlistFile := flag.String("wordlist", "", "Caminho para o arquivo de wordlist (ex: wordlist.txt)")
 	threads := flag.Int("threads", 10, "Número de threads (padrão: 10)")
 	delay := flag.Int("delay", 0, "Atraso em milissegundos entre requisições (padrão: 0)")
+	method := flag.String("method", "GET", "Método HTTP a ser utilizado (padrão: GET)")
 
 	flag.Usage = func() {
 		fmt.Println(`DirHunter - Força bruta de diretórios em servidores web
 Uso:
-  dirhunter -url <URL alvo> -wordlist <arquivo de wordlist> [-threads <número de threads>] [-delay <milissegundos>]
+  dirhunter -url <URL alvo> -wordlist <arquivo de wordlist> [-threads <número de threads>] [-delay <milissegundos>] [-method <GET|POST>]
 
 Parâmetros:
   -url         URL alvo para força bruta (ex: http://example.com)
   -wordlist    Caminho para o arquivo de wordlist (ex: wordlist.txt)
   -threads     Número de threads (opcional, padrão: 10)
   -delay       Atraso em milissegundos entre requisições (opcional, padrão: 0)
+  -method      Método HTTP a ser utilizado (opcional, padrão: GET)
 
 Exemplo:
-  dirhunter -url http://example.com -wordlist wordlist.txt -threads 20 -delay 100
+  dirhunter -url http://example.com -wordlist wordlist.txt -threads 20 -delay 100 -method POST
 `)
 	}
 
@@ -53,7 +55,7 @@ Exemplo:
 		return
 	}
 
-	startBruteForce(*baseURL, words, *threads, *delay)
+	startBruteForce(*baseURL, words, *threads, *delay, *method)
 }
 
 func printSkull() {
@@ -84,14 +86,14 @@ func readWordlist(filename string) ([]string, error) {
 	return words, scanner.Err()
 }
 
-func startBruteForce(baseURL string, wordlist []string, threads int, delay int) {
+func startBruteForce(baseURL string, wordlist []string, threads int, delay int, method string) {
 	var wg sync.WaitGroup
 	wordChan := make(chan string)
 	foundCount := 0
 
 	for i := 0; i < threads; i++ {
 		wg.Add(1)
-		go worker(baseURL, wordChan, &wg, &foundCount, delay)
+		go worker(baseURL, wordChan, &wg, &foundCount, delay, method)
 	}
 
 	for _, word := range wordlist {
@@ -103,25 +105,40 @@ func startBruteForce(baseURL string, wordlist []string, threads int, delay int) 
 	wg.Wait()
 }
 
-func worker(baseURL string, wordChan <-chan string, wg *sync.WaitGroup, foundCount *int, delay int) {
+func worker(baseURL string, wordChan <-chan string, wg *sync.WaitGroup, foundCount *int, delay int, method string) {
 	defer wg.Done()
 
 	for word := range wordChan {
 		url := fmt.Sprintf("%s/%s", strings.TrimRight(baseURL, "/"), word)
-		makeRequest(url, foundCount)
+		makeRequest(url, foundCount, method)
 
 		// Atraso entre requisições
-		if delay > 2 {
+		if delay > 0 {
 			time.Sleep(time.Duration(delay) * time.Millisecond)
 		}
 	}
 }
 
-func makeRequest(url string, foundCount *int) {
+func makeRequest(url string, foundCount *int, method string) {
 	client := &http.Client{
 		Timeout: 10 * time.Second,
 	}
-	resp, err := client.Get(url)
+
+	var req *http.Request
+	var err error
+
+	if method == "POST" {
+		req, err = http.NewRequest("POST", url, nil)
+	} else {
+		req, err = http.NewRequest("GET", url, nil)
+	}
+
+	if err != nil {
+		color.Yellow("Erro ao criar requisição: %v", err)
+		return
+	}
+
+	resp, err := client.Do(req)
 	if err != nil {
 		color.Yellow("Erro ao fazer requisição: %v", err)
 		return
