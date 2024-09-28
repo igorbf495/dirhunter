@@ -40,7 +40,25 @@ DirHunter is an open-source directory brute force tool for web servers written i
 
     
     ./dirhunter -url http://arrozdoce.com -wordlist wordlist.txt -threads 20
-    
+
+
+## Contributing
+
+Feel free to contribute by improving, adding new features, or fixing bugs. Fork the repository and submit a pull request with your changes.
+
+Steps to Contribute:
+
+1. **Fork the repository.**
+
+2. **Create a new branch for your changes (git checkout -b feature/your-feature).**
+
+3. **Commit your changes (git commit -m 'Add new feature').**
+
+4. **Push to GitHub (git push origin feature/your-feature).**
+
+5. **Open a Pull Request.**
+
+
 
 ## Contact
 
